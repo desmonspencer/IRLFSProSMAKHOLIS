@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pengumpulan Tugas Siswa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --bg: #e6f2fa; 
+    --surface: #ffffff; 
+    --ink: #0f2942; 
+    --muted: #4a6580; 
+    --line: #c2d9eb;
+    --accent: #1a5f9c; 
+    --accent-ink: #ffffff; 
+    --stamp: #c62828;
+    --ok-bg: #dcfce7; 
+    --late-bg: #fee2e2; 
+    --focus: #2563eb;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Public Sans", system-ui, sans-serif; font-size: 16px; line-height: 1.55; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 28px 18px 56px; }
+  h1, h2, h3 { font-family: "Bricolage Grotesque", sans-serif; line-height: 1.2; margin: 0; }
+  h1 { font-size: clamp(1.8rem, 4.5vw, 2.5rem); font-weight: 700; letter-spacing: -0.02em; }
+  h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 14px; }
+  .lead { color: var(--muted); max-width: 60ch; margin: 8px 0 0; }
+  
+  header { padding-bottom: 20px; border-bottom: 2px solid var(--ink); display: flex; gap: 18px; align-items: center; justify-content: space-between; }
+  header .teks { min-width: 0; }
+  .logo { flex: none; width: 84px; height: 84px; border-radius: 12px; background: #fff; object-fit: contain; padding: 4px; border: 1.5px solid var(--line); }
+  @media (max-width: 480px) { .logo { width: 64px; height: 64px; } }
+  
+  .tabs { display: flex; gap: 8px; margin: 22px 0; flex-wrap: wrap; }
+  .tab { font: inherit; font-weight: 600; cursor: pointer; padding: 9px 18px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); }
+  .tab[aria-selected="true"] { background: var(--ink); color: #ffffff; border-color: var(--ink); }
+  
+  .panel { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 22px; box-shadow: 0 4px 12px rgba(15,41,66,0.04); }
+  .list { list-style: none; margin: 0; padding: 0; }
+  .task { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 16px 0; border-top: 1px solid var(--line); }
+  .task:first-child { border-top: 0; padding-top: 0; }
+  .task:last-child { padding-bottom: 0; }
+  .task h3 { font-size: 1.1rem; }
+  .meta { color: var(--muted); font-size: .9rem; margin: 4px 0 0; }
+  
+  .tag { display: inline-block; font-size: .78rem; font-weight: 600; padding: 2px 10px; border-radius: 99px; background: var(--ok-bg); color: #166534; margin-left: 8px; vertical-align: middle; }
+  .tag.late { background: var(--late-bg); color: #991b1b; }
+  .btn { display: inline-block; font: inherit; font-weight: 600; cursor: pointer; border: 0; border-radius: 8px; background: var(--accent); color: var(--accent-ink); padding: 11px 18px; text-decoration: none; transition: opacity 0.2s; }
+  .btn:hover { opacity: 0.9; }
+  .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; background: var(--muted); }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); padding: 8px 14px; }
+  
+  label { display: block; font-weight: 600; font-size: .92rem; margin: 14px 0 5px; }
+  input { width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .hint { color: var(--muted); font-size: .88rem; margin: 6px 0 0; }
+  .err { color: var(--stamp); font-weight: 500; margin: 12px 0 0; min-height: 1.2em; }
+  .row { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
+  .row > div { flex: 1 1 220px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="teks">
+      <h1 id="judul"></h1>
+      <p class="lead" id="deskripsi"></p>
+    </div>
+    <img class="logo" alt="Logo BPK PENABUR" width="84" height="84" src="logo bpk.png">
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Menu">
+    <button class="tab" role="tab" id="tab-siswa" aria-selected="true" aria-controls="view-siswa">Kumpulkan Tugas</button>
+    <button class="tab" role="tab" id="tab-guru" aria-selected="false" aria-controls="view-guru">Area Guru</button>
+  </nav>
+
+  <main>
+    <section id="view-siswa" role="tabpanel" aria-labelledby="tab-siswa">
+      <div class="panel">
+        <h2>Daftar Tugas</h2>
+        <ul class="list" id="daftar"></ul>
+      </div>
+    </section>
+
+    <section id="view-guru" role="tabpanel" aria-labelledby="tab-guru" hidden>
+      <div class="panel">
+        <!-- Form Login Guru -->
+        <div id="guru-kunci">
+          <h2>Masuk sebagai Guru</h2>
+          <label for="pw">Password</label>
+          <div class="row">
+            <div><input id="pw" type="password" placeholder="Masukkan password guru..."></div>
+            <button class="btn" id="masuk" type="button">Buka Rekap Jawaban</button>
+          </div>
+          <p class="err" id="pw-err" role="alert"></p>
+        </div>
+
+        <!-- Link Rekap Terbuka -->
+        <div id="guru-buka" hidden>
+          <h2>Rekap Jawaban Siswa</h2>
+          <p class="hint" style="margin:0 0 14px">Password benar! Klik tombol di bawah ini untuk membuka Google Sheet rekap tugas.</p>
+          <a class="btn" id="link-sheet" target="_blank" rel="noopener noreferrer">Buka Google Sheet</a>
+          <button class="btn ghost" id="keluar" type="button" style="margin-left:8px">Kunci Lagi</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* =========================================================================
+   PUSAT PENGATURAN (EDIT LANGSUNG DI NOTEPAD PADA BAGIAN INI)
+   ========================================================================= */
+const CONFIG = {
+  judul: "Kanal Pengumpulan Tugas",
+  deskripsi: "Pilih tugas yang sesuai, buka formulirnya, lalu unggah pekerjaanmu sebelum batas waktu berakhir.",
+  
+  // 1. DAFTAR TUGAS & LINK GOOGLE FORM (UNTUK SISWA)
+  tugas: [
+    { 
+      id: "t1", 
+      nama: "PENGUMPULAN TUGAS IRL", 
+      tenggat: "2026-11-18T23:59", 
+      formUrl: "https://forms.gle/QVxL9NAiGvJ5J3Dw9" 
+    },
+    { 
+      id: "t2", 
+      nama: "Tugas 2 — ", 
+      tenggat: "2026-12-02T23:59", 
+      formUrl: "" 
+    },
+    { 
+      id: "t3", 
+      nama: "Tugas 3 — ", 
+      tenggat: "2026-12-10T17:00", 
+      formUrl: "" 
+    }
+  ],
+
+  // 2. PASSWORD & LINK REKAP TUGAS (UNTUK GURU)
+  // Ketik password pilihan Anda di dalam tanda kutip di bawah ini:
+  passwordGuru: "smakholis", 
+  
+  // Tempel link Google Sheet rekap jawaban di dalam tanda kutip di bawah ini:
+  sheetUrlGuru: "https://docs.google.com/spreadsheets/d/1R5xnooI6QhFAkv1HYSbojde51QEN9oLn4ydnVCPbYG4/edit?usp=sharing"
+};
+/* ========================================================================= */
+
+const $ = (id) => document.getElementById(id);
+const fmt = (ts) => new Date(ts).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" });
+
+$("judul").textContent = CONFIG.judul;
+$("deskripsi").textContent = CONFIG.deskripsi;
+document.title = CONFIG.judul;
+
+// Fungsi perpindahan Tab
+function tab(nama) {
+  const isGuru = nama === "guru";
+  $("view-siswa").hidden = isGuru; 
+  $("view-guru").hidden = !isGuru;
+  $("tab-siswa").setAttribute("aria-selected", String(!isGuru));
+  $("tab-guru").setAttribute("aria-selected", String(isGuru));
+}
+$("tab-siswa").addEventListener("click", () => tab("siswa"));
+$("tab-guru").addEventListener("click", () => tab("guru"));
+
+// Menampilkan Daftar Tugas
+(function renderTugas() {
+  const ul = $("daftar");
+  CONFIG.tugas.forEach((t) => {
+    const li = document.createElement("li"); li.className = "task";
+    const kiri = document.createElement("div");
+    const h = document.createElement("h3"); h.textContent = t.nama;
+    
+    const lewat = Date.now() > Date.parse(t.tenggat);
+    const tag = document.createElement("span");
+    tag.className = "tag" + (lewat ? " late" : ""); 
+    tag.textContent = lewat ? "Tenggat lewat" : "Dibuka";
+    h.appendChild(tag);
+    
+    const m = document.createElement("p"); m.className = "meta"; 
+    m.textContent = "Tenggat: " + fmt(Date.parse(t.tenggat));
+    kiri.append(h, m);
+    
+    const a = document.createElement("a"); a.className = "btn";
+    if (t.formUrl && /^https:\/\//i.test(t.formUrl) && !t.formUrl.includes("TEMPEL_LINK")) {
+      a.href = t.formUrl; a.target = "_blank"; a.rel = "noopener noreferrer"; 
+      a.textContent = "Buka Formulir";
+    } else {
+      a.setAttribute("aria-disabled", "true"); a.setAttribute("role", "link"); 
+      a.textContent = "Formulir belum tersedia";
+    }
+    li.append(kiri, a);
+    ul.appendChild(li);
+  });
+})();
+
+// Logika Login Guru Sederhana
+$("masuk").addEventListener("click", () => {
+  const err = $("pw-err"); 
+  err.textContent = "";
+  const inputPw = $("pw").value;
+  
+  if (!inputPw) { 
+    err.textContent = "Silakan isi password terlebih dahulu."; 
+    return; 
+  }
+  
+  // Mencocokkan input password dengan passwordGuru di CONFIG
+  if (inputPw === CONFIG.passwordGuru) {
+    $("link-sheet").href = CONFIG.sheetUrlGuru;
+    $("pw").value = "";
+    $("guru-kunci").hidden = true;
+    $("guru-buka").hidden = false;
+  } else {
+    err.textContent = "Password salah, silakan coba lagi.";
+  }
+});
+
+// Bisa tekan Enter saat mengetik password
+$("pw").addEventListener("keydown", (e) => { 
+  if (e.key === "Enter") $("masuk").click(); 
+});
+
+// Tombol Kunci Lagi
+$("keluar").addEventListener("click", () => { 
+  $("link-sheet").removeAttribute("href"); 
+  $("guru-buka").hidden = true; 
+  $("guru-kunci").hidden = false; 
+});
+</script>
+</body>
+</html>
